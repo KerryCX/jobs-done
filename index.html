@@ -1,0 +1,499 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jobs Done</title>
+    <style>
+      :root {
+        --ink: #2d2a26;
+        --paper: #fdfbf7;
+        --card: #ffffff;
+        --line: #e7e1d8;
+        --accent: #3e7c59; /* leafy green — done = growth */
+        --accent-soft: #e4f0e9;
+        --gold: #c2862e;
+        --muted: #8a8378;
+        --danger: #b3503e;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: "Avenir Next", "Segoe UI", system-ui, sans-serif;
+        background: var(--paper);
+        color: var(--ink);
+        min-height: 100vh;
+        padding: 1.25rem 1rem 4rem;
+      }
+      .wrap {
+        max-width: 560px;
+        margin: 0 auto;
+      }
+
+      header {
+        text-align: center;
+        margin-bottom: 1.5rem;
+      }
+      h1 {
+        font-family: Georgia, "Times New Roman", serif;
+        font-weight: 700;
+        font-size: 2rem;
+        letter-spacing: -0.02em;
+      }
+      h1 .tick {
+        color: var(--accent);
+      }
+      .tagline {
+        color: var(--muted);
+        font-size: 0.9rem;
+        margin-top: 0.25rem;
+      }
+      .count-line {
+        margin-top: 0.6rem;
+        font-size: 0.85rem;
+        color: var(--accent);
+        font-weight: 600;
+        min-height: 1.2em;
+      }
+
+      .add-row {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1.25rem;
+      }
+      .add-row input {
+        flex: 1;
+        padding: 0.8rem 1rem;
+        font-size: 1rem;
+        font-family: inherit;
+        border: 1.5px solid var(--line);
+        border-radius: 12px;
+        background: var(--card);
+        color: var(--ink);
+        outline: none;
+      }
+      .add-row input:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px var(--accent-soft);
+      }
+      .add-row button {
+        padding: 0.8rem 1.2rem;
+        font-size: 1rem;
+        font-weight: 600;
+        font-family: inherit;
+        border: none;
+        border-radius: 12px;
+        background: var(--accent);
+        color: #fff;
+        cursor: pointer;
+      }
+      .add-row button:active {
+        transform: scale(0.97);
+      }
+
+      .day-group {
+        margin-bottom: 1.1rem;
+      }
+      .day-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--gold);
+        font-weight: 700;
+        margin: 0 0 0.4rem 0.25rem;
+      }
+      ul {
+        list-style: none;
+      }
+      li.job {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 0.65rem 0.75rem;
+        margin-bottom: 0.45rem;
+        animation: pop 0.18s ease-out;
+      }
+      @keyframes pop {
+        from {
+          opacity: 0;
+          transform: translateY(4px);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        li.job {
+          animation: none;
+        }
+      }
+      li.job .dot {
+        width: 22px;
+        height: 22px;
+        flex: none;
+        border-radius: 50%;
+        background: var(--accent-soft);
+        color: var(--accent);
+        display: grid;
+        place-items: center;
+        font-size: 0.8rem;
+        font-weight: 700;
+      }
+      li.job .text {
+        flex: 1;
+        font-size: 0.97rem;
+        line-height: 1.35;
+        overflow-wrap: anywhere;
+      }
+      li.job .time {
+        font-size: 0.72rem;
+        color: var(--muted);
+        flex: none;
+      }
+      li.job .del {
+        flex: none;
+        border: none;
+        background: none;
+        color: var(--muted);
+        font-size: 1.1rem;
+        cursor: pointer;
+        padding: 0.2rem 0.4rem;
+        border-radius: 8px;
+      }
+      li.job .del:hover {
+        color: var(--danger);
+        background: #f8ece9;
+      }
+
+      .empty {
+        text-align: center;
+        color: var(--muted);
+        padding: 2.5rem 1rem;
+        border: 1.5px dashed var(--line);
+        border-radius: 14px;
+        font-size: 0.95rem;
+        line-height: 1.5;
+      }
+
+      .actions {
+        margin-top: 1.5rem;
+        display: grid;
+        gap: 0.55rem;
+      }
+      .actions button {
+        padding: 0.85rem 1rem;
+        font-size: 1rem;
+        font-weight: 600;
+        font-family: inherit;
+        border-radius: 12px;
+        cursor: pointer;
+        border: 1.5px solid var(--line);
+        background: var(--card);
+        color: var(--ink);
+      }
+      .actions .primary {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #fff;
+      }
+      .actions .danger-btn {
+        color: var(--danger);
+      }
+      .actions button:disabled {
+        opacity: 0.45;
+        cursor: default;
+      }
+
+      .toast {
+        position: fixed;
+        bottom: 1rem;
+        left: 50%;
+        transform: translateX(-50%) translateY(80px);
+        background: var(--ink);
+        color: #fff;
+        padding: 0.6rem 1.1rem;
+        border-radius: 999px;
+        font-size: 0.85rem;
+        transition: transform 0.25s ease;
+        pointer-events: none;
+      }
+      .toast.show {
+        transform: translateX(-50%) translateY(0);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <h1><span class="tick">✓</span> Jobs Done</h1>
+        <p class="tagline">Everything you do, made visible.</p>
+        <p class="count-line" id="countLine"></p>
+      </header>
+
+      <div class="add-row">
+        <input
+          id="jobInput"
+          type="text"
+          placeholder="What did you get done?"
+          maxlength="200"
+          autocomplete="off"
+        />
+        <button id="addBtn">Add</button>
+      </div>
+
+      <div id="listArea"></div>
+
+      <div class="actions">
+        <button class="primary" id="emailBtn">📧 Email my jobs list</button>
+        <button id="copyBtn">📋 Copy list to clipboard</button>
+        <button class="danger-btn" id="clearBtn">
+          Clear list (fresh start)
+        </button>
+      </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+      const STORAGE_KEY = "jobs-done-list";
+      let jobs = [];
+
+      const jobInput = document.getElementById("jobInput");
+      const addBtn = document.getElementById("addBtn");
+      const listArea = document.getElementById("listArea");
+      const countLine = document.getElementById("countLine");
+      const emailBtn = document.getElementById("emailBtn");
+      const copyBtn = document.getElementById("copyBtn");
+      const clearBtn = document.getElementById("clearBtn");
+      const toast = document.getElementById("toast");
+
+      let toastTimer;
+      function showToast(msg) {
+        toast.textContent = msg;
+        toast.classList.add("show");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toast.classList.remove("show"), 2200);
+      }
+
+      async function loadJobs() {
+        if (window.storage) {
+          try {
+            const result = await window.storage.get(STORAGE_KEY);
+            jobs = result && result.value ? JSON.parse(result.value) : [];
+          } catch (e) {
+            jobs = []; // key doesn't exist yet — that's fine
+          }
+        }
+        render();
+      }
+
+      async function saveJobs() {
+        if (!window.storage) return; // regular browser tab — list lives in the page while it's open
+        try {
+          await window.storage.set(STORAGE_KEY, JSON.stringify(jobs));
+        } catch (e) {
+          showToast("Couldn\u2019t save — try again");
+        }
+      }
+
+      function dayLabel(ts) {
+        const d = new Date(ts);
+        const today = new Date();
+        const yest = new Date();
+        yest.setDate(today.getDate() - 1);
+        const same = (a, b) => a.toDateString() === b.toDateString();
+        if (same(d, today)) return "Today";
+        if (same(d, yest)) return "Yesterday";
+        return d.toLocaleDateString("en-GB", {
+          weekday: "long",
+          day: "numeric",
+          month: "long",
+        });
+      }
+
+      function timeLabel(ts) {
+        return new Date(ts).toLocaleTimeString("en-GB", {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      }
+
+      function render() {
+        listArea.innerHTML = "";
+        if (jobs.length === 0) {
+          countLine.textContent = "";
+          const empty = document.createElement("div");
+          empty.className = "empty";
+          empty.textContent =
+            "Nothing yet — add your first job above. Even \u201cwalked the dog\u201d counts!";
+          listArea.appendChild(empty);
+        } else {
+          countLine.textContent =
+            jobs.length === 1
+              ? "1 job done \u2014 nice work"
+              : jobs.length + " jobs done \u2014 nice work";
+          // group by day, newest day first, jobs oldest-first within day
+          const groups = {};
+          const order = [];
+          [...jobs]
+            .sort((a, b) => b.ts - a.ts)
+            .forEach((j) => {
+              const label = dayLabel(j.ts);
+              if (!groups[label]) {
+                groups[label] = [];
+                order.push(label);
+              }
+              groups[label].push(j);
+            });
+          order.forEach((label) => {
+            const div = document.createElement("div");
+            div.className = "day-group";
+            const h = document.createElement("p");
+            h.className = "day-label";
+            h.textContent = label;
+            div.appendChild(h);
+            const ul = document.createElement("ul");
+            groups[label]
+              .sort((a, b) => a.ts - b.ts)
+              .forEach((j) => {
+                const li = document.createElement("li");
+                li.className = "job";
+                const dot = document.createElement("span");
+                dot.className = "dot";
+                dot.textContent = "✓";
+                const text = document.createElement("span");
+                text.className = "text";
+                text.textContent = j.text;
+                const time = document.createElement("span");
+                time.className = "time";
+                time.textContent = timeLabel(j.ts);
+                const del = document.createElement("button");
+                del.className = "del";
+                del.textContent = "×";
+                del.setAttribute("aria-label", "Delete this job");
+                del.onclick = async () => {
+                  jobs = jobs.filter((x) => x.id !== j.id);
+                  await saveJobs();
+                  render();
+                };
+                li.append(dot, text, time, del);
+                ul.appendChild(li);
+              });
+            div.appendChild(ul);
+            listArea.appendChild(div);
+          });
+        }
+        const none = jobs.length === 0;
+        emailBtn.disabled = none;
+        copyBtn.disabled = none;
+        clearBtn.disabled = none;
+      }
+
+      async function addJob() {
+        const text = jobInput.value.trim();
+        if (!text) return;
+        jobs.push({
+          id: Date.now() + "-" + Math.random().toString(36).slice(2, 7),
+          text,
+          ts: Date.now(),
+        });
+        jobInput.value = "";
+        jobInput.focus();
+        await saveJobs();
+        render();
+      }
+
+      function buildListText() {
+        const lines = [];
+        const groups = {};
+        const order = [];
+        [...jobs]
+          .sort((a, b) => a.ts - b.ts)
+          .forEach((j) => {
+            const label = dayLabel(j.ts);
+            if (!groups[label]) {
+              groups[label] = [];
+              order.push(label);
+            }
+            groups[label].push(j);
+          });
+        order.forEach((label) => {
+          lines.push(label + ":");
+          groups[label].forEach((j) =>
+            lines.push("  \u2713 " + j.text + " (" + timeLabel(j.ts) + ")"),
+          );
+          lines.push("");
+        });
+        lines.push(
+          "\u2014 " +
+            jobs.length +
+            (jobs.length === 1 ? " job" : " jobs") +
+            " done in total \uD83C\uDF89",
+        );
+        return lines.join("\n");
+      }
+
+      emailBtn.onclick = () => {
+        const subject = "What I\u2019ve been up to \u2014 jobs done!";
+        const body =
+          "Thought you might like to see what my day looked like!\n\n" +
+          buildListText();
+        window.location.href =
+          "mailto:?subject=" +
+          encodeURIComponent(subject) +
+          "&body=" +
+          encodeURIComponent(body);
+      };
+
+      copyBtn.onclick = async () => {
+        const text = buildListText();
+        try {
+          await navigator.clipboard.writeText(text);
+          showToast("Copied! Paste it anywhere");
+        } catch (e) {
+          // fallback
+          const ta = document.createElement("textarea");
+          ta.value = text;
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand("copy");
+          document.body.removeChild(ta);
+          showToast("Copied! Paste it anywhere");
+        }
+      };
+
+      clearBtn.onclick = async () => {
+        if (
+          !confirm("Clear the whole list? (Do this after you\u2019ve sent it)")
+        )
+          return;
+        jobs = [];
+        await saveJobs();
+        render();
+        showToast("Fresh start \u2014 go do great things");
+      };
+
+      addBtn.onclick = addJob;
+      jobInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") addJob();
+      });
+
+      // Warn before closing the tab if there are unsent jobs on the list
+      window.addEventListener("beforeunload", (e) => {
+        if (jobs.length > 0) {
+          e.preventDefault();
+          e.returnValue = ""; // required by some browsers to show the prompt
+        }
+      });
+
+      loadJobs();
+    </script>
+  </body>
+</html>
