@@ -12,6 +12,7 @@ export default defineConfig({
     // The app formats times for en-GB, so pin the locale and timezone.
     locale: "en-GB",
     timezoneId: "Europe/London",
+    reducedMotion: "reduce",
     trace: "on-first-retry",
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
