@@ -16,7 +16,7 @@ It started as a brainstorming conversation with Claude (Anthropic's AI assistant
 
 It was built for busy parents (by a busy mum) who wanted a frictionless way to say _"here's what my day looked like."_
 
-📖 Read the full [case study](CASE_STUDY.md) for the story, design decisions and learnings behind the app, or the [portfolio write-up](https://kerryclements.com/portfolio/jobs-done).
+📖 Read the [case study](https://kerryclements.com/portfolio/jobs-done) for the story, design decisions and learnings behind the app.
 
 ## Features
 
