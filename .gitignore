@@ -8,3 +8,9 @@
 # Future build tooling (just in case)
 node_modules/
 dist/
+
+# Playwright
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
